@@ -64,7 +64,7 @@ public class HtmlParser {
             int dbPageId = indexManager.addPage(page.url, page.title, page.lastModifiedDate, page.sizeOfPage);
             System.out.println("Added page to DB with ID: " + dbPageId + ", Title: " + page.title);
             
-            StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!");
+            StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
             Map<String, Integer> bodyWordFreq = new HashMap<>();
             
             while (st.hasMoreTokens()) {
@@ -89,7 +89,7 @@ public class HtmlParser {
             }
             System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
             
-            st = new StringTokenizer(doc.head().text(), " (),.?:/!");
+            st = new StringTokenizer(doc.head().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
             Map<String, Integer> titleWordFreq = new HashMap<>();
             
             while (st.hasMoreTokens()) {
