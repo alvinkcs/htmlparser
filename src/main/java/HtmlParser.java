@@ -157,7 +157,7 @@ public class HtmlParser {
     }
 
     public static void main(String[] args) {
-        String url = "https://comp4321-hkust.github.io/testpages/testpage.htm";
+        String url = "https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm";
         String backupUrl = "https://comp4321-hkust.github.io/testpages/testpage.htm";
         String finalUrl = url;
         try {
