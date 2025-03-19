@@ -20,8 +20,18 @@
             <artifactId>jsoup</artifactId>
             <version>1.19.1</version>
         </dependency>
+        <dependency>
+            <groupId>jdbm</groupId>
+            <artifactId>jdbm</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
-
-
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 </project>
