@@ -31,6 +31,7 @@ public class HtmlParser {
         public int numOfChildPages;
         public Dictionary<String, Dictionary<Integer, Integer>> titleStem = new Hashtable<>();
         public Dictionary<String, Dictionary<Integer, Integer>> bodyStem = new Hashtable<>();
+        public boolean extractedKeywords = false;
         
         public Page(String url, int pageID) {
             this.url = url;
@@ -63,54 +64,59 @@ public class HtmlParser {
             
             int dbPageId = indexManager.addPage(page.url, page.title, page.lastModifiedDate, page.sizeOfPage);
             System.out.println("Added page to DB with ID: " + dbPageId + ", Title: " + page.title);
-            
-            StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
-            Map<String, Integer> bodyWordFreq = new HashMap<>();
-            
-            while (st.hasMoreTokens()) {
-                String nextToken = st.nextToken().toLowerCase();
-                if (!stopStem.isStopWord(nextToken)){
-                    String token_word = stopStem.stem(nextToken);
-                    
-                    if (page.bodyStem.get(token_word) != null){
-                        page.bodyStem.get(token_word).put(page.pageID, page.bodyStem.get(token_word).get(page.pageID)+1);
-                    } else {
-                        Hashtable<Integer, Integer> tmpDict = new Hashtable<>();
-                        tmpDict.put(page.pageID, 1);
-                        page.bodyStem.put(token_word, tmpDict);
+
+            boolean pageHasUpdate = indexManager.hasUpdate(page.url);
+
+            if (!page.extractedKeywords || pageHasUpdate){
+                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
+                Map<String, Integer> bodyWordFreq = new HashMap<>();
+
+                while (st.hasMoreTokens()) {
+                    String nextToken = st.nextToken().toLowerCase();
+                    if (!stopStem.isStopWord(nextToken)){
+                        String token_word = stopStem.stem(nextToken);
+
+                        if (page.bodyStem.get(token_word) != null){
+                            page.bodyStem.get(token_word).put(page.pageID, page.bodyStem.get(token_word).get(page.pageID)+1);
+                        } else {
+                            Hashtable<Integer, Integer> tmpDict = new Hashtable<>();
+                            tmpDict.put(page.pageID, 1);
+                            page.bodyStem.put(token_word, tmpDict);
+                        }
+
+                        bodyWordFreq.put(token_word, bodyWordFreq.getOrDefault(token_word, 0) + 1);
                     }
-                    
-                    bodyWordFreq.put(token_word, bodyWordFreq.getOrDefault(token_word, 0) + 1);
                 }
-            }
-            
-            for (Map.Entry<String, Integer> entry : bodyWordFreq.entrySet()) {
-                indexManager.addWordToBody(dbPageId, entry.getKey(), entry.getValue());
-            }
-            System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
-            
-            st = new StringTokenizer(doc.head().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
-            Map<String, Integer> titleWordFreq = new HashMap<>();
-            
-            while (st.hasMoreTokens()) {
-                String nextToken = st.nextToken().toLowerCase();
-                if (!stopStem.isStopWord(nextToken)){
-                    String token_word = stopStem.stem(nextToken);
-                    
-                    if (page.titleStem.get(token_word) != null){
-                        page.titleStem.get(token_word).put(page.pageID, page.titleStem.get(token_word).get(page.pageID)+1);
-                    } else {
-                        Hashtable<Integer, Integer> tmpDict = new Hashtable<>();
-                        tmpDict.put(page.pageID, 1);
-                        page.titleStem.put(token_word, tmpDict);
+
+                for (Map.Entry<String, Integer> entry : bodyWordFreq.entrySet()) {
+                    indexManager.addWordToBody(dbPageId, entry.getKey(), entry.getValue());
+                }
+                System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
+
+                st = new StringTokenizer(doc.head().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
+                Map<String, Integer> titleWordFreq = new HashMap<>();
+
+                while (st.hasMoreTokens()) {
+                    String nextToken = st.nextToken().toLowerCase();
+                    if (!stopStem.isStopWord(nextToken)){
+                        String token_word = stopStem.stem(nextToken);
+
+                        if (page.titleStem.get(token_word) != null){
+                            page.titleStem.get(token_word).put(page.pageID, page.titleStem.get(token_word).get(page.pageID)+1);
+                        } else {
+                            Hashtable<Integer, Integer> tmpDict = new Hashtable<>();
+                            tmpDict.put(page.pageID, 1);
+                            page.titleStem.put(token_word, tmpDict);
+                        }
+
+                        titleWordFreq.put(token_word, titleWordFreq.getOrDefault(token_word, 0) + 1);
                     }
-                    
-                    titleWordFreq.put(token_word, titleWordFreq.getOrDefault(token_word, 0) + 1);
                 }
-            }
-            
-            for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
-                indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
+
+                for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
+                    indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
+                }
+                page.extractedKeywords = true;
             }
 
             Elements links = doc.select("a");
@@ -118,25 +124,13 @@ public class HtmlParser {
                 String absHref = link.attr("abs:href");
                 
                 if (absHref.isEmpty()) continue;
-
-                boolean existed = false;
-                for (Page p : db) {
-                    if (p.url.equals(absHref)) {
-                        URL url_check_date = new URL(page.url);
-                        URLConnection connection_check_date = url_check_date.openConnection();
-                        if (!(connection_check_date.getLastModified() > p.lastModifiedDate)){
-                            existed = true;
-                            break;
-                        }
-                    }
-                }
                 
-                if (!existed && doc_num[0] < doc_max){
+                if (!indexManager.hasPage(absHref) && doc_num[0] < doc_max){
                     Page childPage = new Page(absHref, ++doc_num[0]);
                     childPage.parentPage = page;
                     page.addChildPage(childPage);
                     db.add(childPage);
-                    
+
                     int childPageId = indexManager.addPage(absHref, "", childPage.lastModifiedDate, childPage.sizeOfPage);
                     indexManager.addChildPage(dbPageId, childPageId);
                 }

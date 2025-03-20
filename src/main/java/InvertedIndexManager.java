@@ -8,6 +8,8 @@ import jdbm.htree.HTree;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -143,7 +145,24 @@ public class InvertedIndexManager implements AutoCloseable {
             return nextId;
         }
     }
-    
+
+    public boolean hasUpdate(String url) throws IOException {
+        if (urlToPageIdMap.get(url) != null){
+            PageInfo page = (PageInfo) pageInfoMap.get(urlToPageIdMap.get(url));
+
+            URL url_check_date = new URL(url);
+            URLConnection connection_check_date = url_check_date.openConnection();
+            connection_check_date.getLastModified();
+            return (connection_check_date.getLastModified() > page.lastModifiedDate);
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasPage(String url) throws IOException {
+        return (urlToPageIdMap.get(url) != null);
+    }
+
     /**
      * Add a page to the database
      */
