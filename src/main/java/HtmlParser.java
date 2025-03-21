@@ -68,13 +68,18 @@ public class HtmlParser {
             boolean pageHasUpdate = indexManager.hasUpdate(page.url);
 
             if (!page.extractedKeywords || pageHasUpdate){
-                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
+                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>;\"\n\t\\\b|©#$*•»&");
                 Map<String, Integer> bodyWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
                     String nextToken = st.nextToken().toLowerCase();
                     if (!stopStem.isStopWord(nextToken)){
                         String token_word = stopStem.stem(nextToken);
+
+                        if (token_word.equals("")){
+                            System.out.println(nextToken + " becomes empty after tokenization");
+                            continue;
+                        }
 
                         if (page.bodyStem.get(token_word) != null){
                             page.bodyStem.get(token_word).put(page.pageID, page.bodyStem.get(token_word).get(page.pageID)+1);
@@ -93,7 +98,7 @@ public class HtmlParser {
                 }
                 System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
 
-                st = new StringTokenizer(doc.head().text(), " (),.?:/!<>-;\"\n\t\\|©#$*•»");
+                st = new StringTokenizer(doc.head().text(), " (),.?:/!<>;\"\n\t\\\b|©#$*•»&");
                 Map<String, Integer> titleWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
@@ -155,7 +160,7 @@ public class HtmlParser {
         String backupUrl = "https://comp4321-hkust.github.io/testpages/testpage.htm";
         String finalUrl = url;
         try {
-            Jsoup.connect(url).timeout(5000).get();
+            Jsoup.connect(url).timeout(10000).get();
         } catch (Exception e) {
             System.out.println("Primary URL failed, trying backup URL...");
             finalUrl = backupUrl;
