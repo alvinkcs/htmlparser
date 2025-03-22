@@ -77,7 +77,7 @@ public class HtmlParser {
                         String token_word = stopStem.stem(nextToken);
 
                         if (token_word.equals("")){
-                            System.out.println(nextToken + " becomes empty after tokenization");
+//                            System.out.println(nextToken + " becomes empty after tokenization");
                             continue;
                         }
 
@@ -124,6 +124,7 @@ public class HtmlParser {
                 page.extractedKeywords = true;
             }
 
+            // retrieve links inside a page (child page)
             Elements links = doc.select("a");
             for (Element link:links){
                 String absHref = link.attr("abs:href");
@@ -142,7 +143,7 @@ public class HtmlParser {
             }
             
             ++track[0];
-            while (track[0] <= doc_num[0]){
+            while (track[0] < doc_num[0]){ // track can prevent document skipping if read timeout occurs
                 try {
                     spider(indexManager, db.get(track[0]), doc_max, doc_num, track, db);
                 } catch (Exception e) {
@@ -160,7 +161,7 @@ public class HtmlParser {
         String backupUrl = "https://comp4321-hkust.github.io/testpages/testpage.htm";
         String finalUrl = url;
         try {
-            Jsoup.connect(url).timeout(10000).get();
+            Jsoup.connect(url).timeout(20000).get();
         } catch (Exception e) {
             System.out.println("Primary URL failed, trying backup URL...");
             finalUrl = backupUrl;
@@ -172,16 +173,17 @@ public class HtmlParser {
             Page firstPage = new Page(finalUrl, 0);
             db.add(firstPage);
             int doc_max = 30;
-            int[] doc_num = new int[1];
-            int[] track = new int[1];
+            int[] doc_num = new int[1]; // counting the no. of documents fetched
+            int[] track = new int[1]; // tracking which document to perform BFS
+            ++doc_num[0];
             
             System.out.println("Starting web crawling...");
             spider(indexManager, db.getFirst(), doc_max, doc_num, track, db);
             System.out.println("Finished web crawling. Total pages indexed: " + doc_num[0]);
             
-            generateResultFile(indexManager);
-            
-            System.out.println("Spider result file generated: " + OUTPUT_FILE);
+//            generateResultFile(indexManager);
+//
+//            System.out.println("Spider result file generated: " + OUTPUT_FILE);
         } catch (Exception e) {
             System.err.println("Error during crawling: " + e.getMessage());
             e.printStackTrace();

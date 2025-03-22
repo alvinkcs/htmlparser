@@ -46,10 +46,9 @@ To run the spider and generate both the database and the output file:
 1. Run: mvn exec:java -Dexec.mainClass="HtmlParser"
 
 This will:
-- Start the crawler from the seed URL
+- Start the crawler from the seed URL (if the primary URL has no response for 20s, use backup URL instead)
 - Index 30 pages
 - Generate the spider_index.db database file
-- Generate a spider_result.txt file with the crawled data
 
 Running the Test Program
 -----------------------

@@ -169,6 +169,11 @@ public class InvertedIndexManager implements AutoCloseable {
     public int addPage(String url, String title, long lastModifiedDate, long size) throws IOException {
         // Check if URL already exists
         if (urlToPageIdMap.get(url) != null) {
+            // add back title as the page has no title if it's child page
+            PageInfo originalPageInfo = (PageInfo) pageInfoMap.get(urlToPageIdMap.get(url));
+            PageInfo newPageInfo = new PageInfo(originalPageInfo.url, title, originalPageInfo.lastModifiedDate, originalPageInfo.size);
+            pageInfoMap.put(urlToPageIdMap.get(url), newPageInfo);
+
             return (Integer) urlToPageIdMap.get(url);
         }
         
