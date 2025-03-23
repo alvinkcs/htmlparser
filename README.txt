@@ -20,8 +20,7 @@ Running the Spider
 -----------------
 To run the spider and generate both the database and the output file:
 
-1. Delete the existing spider_index.db
-2. Run: mvn exec:java -Dexec.mainClass="HtmlParser"
+1. Run: mvn exec:java -Dexec.mainClass="HtmlParser"
 
 This will:
 - Start the crawler from the seed URL
@@ -29,7 +28,7 @@ This will:
 - Generate the spider_index.db database file
 
 Remarks:
-- If spider_index.db is existed before running HtmlParser, the spider will check if the last-modified date of seed URL. No more searching will be performed if there is no change of seed URL.
+- If spider_index.db is existed before running HtmlParser, the spider will read the db and check the last-modified date of fetched URLs. Updates will be performed only if page is modified.
 
 Running the Test Program
 -----------------------

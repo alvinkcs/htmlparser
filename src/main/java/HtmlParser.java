@@ -120,23 +120,32 @@ public class HtmlParser {
                 for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
                     indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
                 }
+            }
+            // retrieve links inside a page (child page)
+            Elements links = doc.select("a");
+            for (Element link:links){
+                String absHref = link.attr("abs:href");
 
-                // retrieve links inside a page (child page)
-                Elements links = doc.select("a");
-                for (Element link:links){
-                    String absHref = link.attr("abs:href");
+                if (absHref.isEmpty()) continue;
 
-                    if (absHref.isEmpty()) continue;
-
-                    if (!indexManager.hasPage(absHref) && doc_num[0] < doc_max){
-                        Page childPage = new Page(absHref, ++doc_num[0]);
-                        childPage.parentPage = page;
-                        page.addChildPage(childPage);
-                        db.add(childPage);
-
-                        int childPageId = indexManager.addPage(absHref, "", childPage.lastModifiedDate, childPage.sizeOfPage);
-                        indexManager.addChildPage(dbPageId, childPageId);
+                boolean isParent = false;
+                Page parent = page.parentPage;
+                while (parent != null){
+                    if (parent.url.equals(absHref)){
+                        isParent = true;
+                        break;
                     }
+                    parent = parent.parentPage;
+                }
+
+                if (!isParent && doc_num[0] < doc_max){
+                    Page childPage = new Page(absHref, ++doc_num[0]);
+                    childPage.parentPage = page;
+                    page.addChildPage(childPage);
+                    db.add(childPage);
+
+                    int childPageId = indexManager.addPage(absHref, "", childPage.lastModifiedDate, childPage.sizeOfPage);
+                    indexManager.addChildPage(dbPageId, childPageId);
                 }
             }
             
