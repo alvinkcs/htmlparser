@@ -163,6 +163,17 @@ public class InvertedIndexManager implements AutoCloseable {
         return (urlToPageIdMap.get(url) != null);
     }
 
+    public boolean hasKeyword(String url) throws IOException {
+        if (urlToPageIdMap.get(url) != null){
+            ArrayList<String> bodyWordList = (ArrayList<String>) pageIdToBodyWordsMap.get(urlToPageIdMap.get(url));
+            ArrayList<String> titleWordList = (ArrayList<String>) pageIdToTitleWordsMap.get(urlToPageIdMap.get(url));
+            return (!bodyWordList.isEmpty() || !titleWordList.isEmpty());
+        } else {
+            return false;
+        }
+    }
+
+
     /**
      * Add a page to the database
      */
@@ -170,10 +181,12 @@ public class InvertedIndexManager implements AutoCloseable {
         // Check if URL already exists
         if (urlToPageIdMap.get(url) != null) {
             // add back title as the page has no title if it's child page
-            PageInfo originalPageInfo = (PageInfo) pageInfoMap.get(urlToPageIdMap.get(url));
-            PageInfo newPageInfo = new PageInfo(originalPageInfo.url, title, originalPageInfo.lastModifiedDate, originalPageInfo.size);
-            pageInfoMap.put(urlToPageIdMap.get(url), newPageInfo);
-
+            if (!title.equals("")){
+                PageInfo newPageInfo = getPageInfo((Integer) urlToPageIdMap.get(url));
+                newPageInfo.title = title;
+                pageInfoMap.put(urlToPageIdMap.get(url), newPageInfo);
+                recman.commit();
+            }
             return (Integer) urlToPageIdMap.get(url);
         }
         

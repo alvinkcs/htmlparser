@@ -1,7 +1,7 @@
 Test page
 https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm
 2023-05-16 13:03:16, 603 bytes
-test 2; page 2; new 1; read 1; intern 1; movi 1; book 1; list 1; admis 1; crawler 1
+new 2; test 2; page 2; read 1; intern 1; movi 1; book 1; list 1; admis 1; crawler 1
 https://www.cse.ust.hk/~kwtleung/COMP4321/ust_cse.htm
 https://www.cse.ust.hk/~kwtleung/COMP4321/news.htm
 https://www.cse.ust.hk/~kwtleung/COMP4321/books.htm
@@ -82,90 +82,90 @@ term 6; relev 6; mathemat 5; system 5; mean 3; inform 2; subject 2; agreem 2; bo
 Dinosaur Planet (2003)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/1.html
 2023-05-16 13:03:16, 3605 bytes
-dinosaur 28; search 15; titl 15; planet 12; movi 9; tv 7; match 7; result 6; giant 5; episod 5
+dinosaur 27; search 15; titl 14; planet 11; movi 8; match 7; tv 6; giant 5; episod 5; imdb 5
 ----------------------------------------
 Isle of Man TT 2004 Review (2004)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/2.html
 2023-05-16 13:03:26, 2868 bytes
-search 15; review 11; titl 11; 2004 11; movi 8; tt 7; isl 7; episod 5; tv 5; imdb 5
+search 15; review 11; titl 10; 2004 10; tt 7; isl 7; movi 7; episod 5; imdb 5; match 5
 ----------------------------------------
 Character (1997)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/3.html
 2023-05-16 13:03:36, 4008 bytes
-charact 42; search 15; titl 14; movi 8; aka 6; tv 6; match 6; episod 5; studi 5; result 5
+charact 42; search 15; titl 13; movi 7; aka 6; match 6; episod 5; studi 5; tv 5; imdb 5
 ----------------------------------------
 Paula Abdul's Get Up and Dance (1994)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/4.html
 2023-05-16 13:03:38, 2820 bytes
-search 15; titl 12; danc 11; paula 9; abdul 9; movi 8; match 6; episod 5; result 5; imdb 5
+search 15; titl 11; danc 11; abdul 9; paula 8; movi 7; match 6; episod 5; imdb 5; result 3
 ----------------------------------------
 The Rise and Fall of ECW (2004)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/5.html
 2023-05-16 13:03:38, 3928 bytes
-fall 28; rise 28; search 15; titl 13; tv 9; movi 9; ecw 8; match 6; episod 5; result 5
+fall 28; rise 28; search 15; titl 12; tv 8; ecw 8; movi 8; the 7; match 6; episod 5
 ----------------------------------------
 Sick (1997)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/6.html
 2023-05-16 13:03:40, 5243 bytes
-sick 69; titl 17; search 15; aka 14; tv 9; movi 8; love 7; anim 6; usa 6; twist 6
+sick 70; titl 16; search 15; aka 14; v 9; tv 8; love 7; movi 7; anim 6; usa 6
 ----------------------------------------
 8 Man (1992)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/7.html
 2023-05-16 13:03:40, 3498 bytes
-8 16; search 15; titl 13; movi 8; aka 7; match 7; result 6; tv 6; episod 5; usa 5
+search 15; 8 14; titl 12; man 7; aka 7; movi 7; match 7; episod 5; v 5; tv 5
 ----------------------------------------
 What the #$*! Do We Know!? (2004)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/8.html
 2023-05-16 13:03:42, 4147 bytes
-titl 17; search 15; aka 8; know 8; movi 8; tv 6; episod 5; usa 5; imdb 5; 2004 5
+titl 16; search 15; know 10; aka 8; movi 7; what 7; episod 5; tv 5; usa 5; imdb 5
 ----------------------------------------
 Class of Nuke 'Em High 2 (1991)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/9.html
 2023-05-16 13:03:44, 7075 bytes
-imdb 11; movi 11; class 10; user 10; em 9; rate 9; subhumanoid 9; nuke 9; plot 6; meltdown 6
+imdb 11; movi 10; user 10; em 9; rate 9; class 9; subhumanoid 9; nuke 9; plot 6; meltdown 6
 ----------------------------------------
 Fighter (2001)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/10.html
 2023-05-16 13:03:16, 13199 bytes
-fighter 221; aka 91; titl 60; street 57; vg 40; english 34; ii 21; usa 21; search 16; 2 13
+fighter 220; aka 91; titl 59; street 56; vg 40; english 34; ii 21; usa 21; search 16; the 16
 ----------------------------------------
 Full Frame: Documentary Shorts (1999)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/11.html
 2023-05-16 13:03:18, 2700 bytes
-search 15; titl 11; short 9; movi 8; documentari 7; frame 7; episod 5; imdb 5; match 5; result 4
+search 15; titl 10; short 9; documentari 7; frame 7; movi 7; episod 5; imdb 5; full 5; match 5
 ----------------------------------------
 My Favorite Brunette (1947)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/12.html
 2023-05-16 13:03:18, 6432 bytes
-movi 14; imdb 11; user 11; rate 10; favorit 7; brunett 7; 1947 6; plot 6; hope 6; amazon 6
+movi 13; imdb 11; rate 10; user 10; favorit 7; brunett 7; 1947 6; plot 6; hope 6; detail 5
 ----------------------------------------
 Lord of the Rings: The Return of the King: Extended Edition: Bonus Material (2003)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/13.html
 2023-05-16 13:03:20, 2997 bytes
-search 15; titl 10; return 9; movi 9; ring 8; king 8; lord 8; extend 7; materi 7; edition 7
+search 15; return 9; titl 9; ring 8; king 8; lord 8; movi 8; extend 7; materi 7; edition 7
 ----------------------------------------
 Nature: Antarctica (1982)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/14.html
 2023-05-16 13:03:20, 3711 bytes
-antarctica 22; search 15; titl 15; natur 8; aka 8; tv 8; movi 8; antarct 7; match 6; episod 5
+antarctica 21; search 15; titl 14; natur 8; aka 8; antarct 7; tv 7; movi 7; match 6; episod 5
 ----------------------------------------
 Neil Diamond: Greatest Hits Live (1988)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/15.html
 2023-05-16 13:03:20, 5415 bytes
-imdb 11; user 10; movi 9; rate 8; neil 8; diamond 8; concert 7; detail 6; live 6; 1988 6
+imdb 11; user 10; rate 8; movi 8; diamond 8; concert 7; neil 7; detail 6; live 6; 1988 6
 ----------------------------------------
 Screamers (1996)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/16.html
 2023-05-16 13:03:22, 3737 bytes
-screamer 19; titl 17; search 15; aka 12; movi 9; scream 8; match 7; result 6; episod 5; usa 5
+screamer 18; titl 16; search 15; aka 12; scream 8; movi 8; match 7; episod 5; usa 5; imdb 5
 ----------------------------------------
 7 Seconds (2005)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/17.html
 2023-05-16 13:03:22, 3521 bytes
-search 15; titl 13; 7 8; result 8; movi 8; aka 6; match 6; episod 5; tv 5; imdb 5
+search 15; second 13; titl 12; 7 7; movi 7; aka 6; match 6; episod 5; result 5; imdb 5
 ----------------------------------------
 Immortal Beloved (1994)
 https://www.cse.ust.hk/~kwtleung/COMP4321/Movie/18.html
 2023-05-16 13:03:24, 7583 bytes
-movi 13; imdb 11; user 11; van 9; rate 8; belov 8; immort 8; beethoven 7; ludwig 7; music 6
+movi 12; imdb 11; user 10; rate 8; belov 8; immort 8; beethoven 7; ludwig 7; van 7; music 6
 ----------------------------------------

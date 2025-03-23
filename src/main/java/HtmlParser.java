@@ -31,7 +31,6 @@ public class HtmlParser {
         public int numOfChildPages;
         public Dictionary<String, Dictionary<Integer, Integer>> titleStem = new Hashtable<>();
         public Dictionary<String, Dictionary<Integer, Integer>> bodyStem = new Hashtable<>();
-        public boolean extractedKeywords = false;
         
         public Page(String url, int pageID) {
             this.url = url;
@@ -67,8 +66,8 @@ public class HtmlParser {
 
             boolean pageHasUpdate = indexManager.hasUpdate(page.url);
 
-            if (!page.extractedKeywords || pageHasUpdate){
-                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.:/<>;\"\n\t\\\b"); // " (),.?:/!<>;\"\n\t\\\b|©#$*•»&"
+            if (!indexManager.hasKeyword(page.url) || pageHasUpdate){ // !page.extractedKeywords || pageHasUpdate
+                StringTokenizer st = new StringTokenizer(doc.body().text(), " "); // " (),.:/<>;\"\n\t\\\b"
                 Map<String, Integer> bodyWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
@@ -98,7 +97,7 @@ public class HtmlParser {
                 }
                 System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
 
-                st = new StringTokenizer(doc.head().text(), " (),.:/<>;\"\n\t\\\b");
+                st = new StringTokenizer(doc.head().text(), " ");
                 Map<String, Integer> titleWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
@@ -121,24 +120,23 @@ public class HtmlParser {
                 for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
                     indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
                 }
-                page.extractedKeywords = true;
-            }
 
-            // retrieve links inside a page (child page)
-            Elements links = doc.select("a");
-            for (Element link:links){
-                String absHref = link.attr("abs:href");
-                
-                if (absHref.isEmpty()) continue;
-                
-                if (!indexManager.hasPage(absHref) && doc_num[0] < doc_max){
-                    Page childPage = new Page(absHref, ++doc_num[0]);
-                    childPage.parentPage = page;
-                    page.addChildPage(childPage);
-                    db.add(childPage);
+                // retrieve links inside a page (child page)
+                Elements links = doc.select("a");
+                for (Element link:links){
+                    String absHref = link.attr("abs:href");
 
-                    int childPageId = indexManager.addPage(absHref, "", childPage.lastModifiedDate, childPage.sizeOfPage);
-                    indexManager.addChildPage(dbPageId, childPageId);
+                    if (absHref.isEmpty()) continue;
+
+                    if (!indexManager.hasPage(absHref) && doc_num[0] < doc_max){
+                        Page childPage = new Page(absHref, ++doc_num[0]);
+                        childPage.parentPage = page;
+                        page.addChildPage(childPage);
+                        db.add(childPage);
+
+                        int childPageId = indexManager.addPage(absHref, "", childPage.lastModifiedDate, childPage.sizeOfPage);
+                        indexManager.addChildPage(dbPageId, childPageId);
+                    }
                 }
             }
             
@@ -160,12 +158,20 @@ public class HtmlParser {
         String url = "https://www.cse.ust.hk/~kwtleung/COMP4321/testpage.htm";
         String backupUrl = "https://comp4321-hkust.github.io/testpages/testpage.htm";
         String finalUrl = url;
-        try {
-            Jsoup.connect(url).timeout(30000).get();
-        } catch (Exception e) {
-            System.out.println("Primary URL failed, trying backup URL...");
-            finalUrl = backupUrl;
-        }
+        do {
+            try {
+                Jsoup.connect(url).timeout(5000).get();
+                break;
+            } catch (Exception e) {
+                System.out.println("Primary URL failed, reconnecting...");
+            }
+        } while (true);
+//        try {
+//            Jsoup.connect(url).timeout(20000).get();
+//        } catch (Exception e) {
+//            System.out.println("Primary URL failed, trying backup URL...");
+//            finalUrl = backupUrl;
+//        }
         
         try (InvertedIndexManager indexManager = new InvertedIndexManager("spider_index")) {
             
