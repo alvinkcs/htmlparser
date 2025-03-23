@@ -279,6 +279,7 @@ public class InvertedIndexManager implements AutoCloseable {
         
         return pageIds;
     }
+
     
     /**
      * Get top keywords for a page (by frequency)
@@ -298,6 +299,25 @@ public class InvertedIndexManager implements AutoCloseable {
                 if (postings != null && postings.containsKey(pageId)) {
                     String word = (String) wordIdToWordMap.get(wordId);
                     keywords.put(word, postings.get(pageId));
+                }
+            }
+        }
+
+        // Collect words from body index
+       iter = titleInvertedIndex.keys();
+
+        while ((key = iter.next()) != null) {
+            if (key instanceof Integer) {
+                int wordId = (Integer) key;
+                HashMap<Integer, Integer> postings = (HashMap<Integer, Integer>) titleInvertedIndex.get(wordId);
+
+                if (postings != null && postings.containsKey(pageId)) {
+                    String word = (String) wordIdToWordMap.get(wordId);
+                    if (keywords.get(word) != null){
+                        keywords.put(word, postings.get(pageId) + keywords.get(word));
+                    } else {
+                        keywords.put(word, postings.get(pageId));
+                    }
                 }
             }
         }

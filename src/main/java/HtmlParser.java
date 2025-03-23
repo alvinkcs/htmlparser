@@ -68,7 +68,7 @@ public class HtmlParser {
             boolean pageHasUpdate = indexManager.hasUpdate(page.url);
 
             if (!page.extractedKeywords || pageHasUpdate){
-                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.?:/!<>;\"\n\t\\\b|©#$*•»&");
+                StringTokenizer st = new StringTokenizer(doc.body().text(), " (),.:/<>;\"\n\t\\\b"); // " (),.?:/!<>;\"\n\t\\\b|©#$*•»&"
                 Map<String, Integer> bodyWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
@@ -98,7 +98,7 @@ public class HtmlParser {
                 }
                 System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
 
-                st = new StringTokenizer(doc.head().text(), " (),.?:/!<>;\"\n\t\\\b|©#$*•»&");
+                st = new StringTokenizer(doc.head().text(), " (),.:/<>;\"\n\t\\\b");
                 Map<String, Integer> titleWordFreq = new HashMap<>();
 
                 while (st.hasMoreTokens()) {
@@ -161,7 +161,7 @@ public class HtmlParser {
         String backupUrl = "https://comp4321-hkust.github.io/testpages/testpage.htm";
         String finalUrl = url;
         try {
-            Jsoup.connect(url).timeout(20000).get();
+            Jsoup.connect(url).timeout(30000).get();
         } catch (Exception e) {
             System.out.println("Primary URL failed, trying backup URL...");
             finalUrl = backupUrl;
