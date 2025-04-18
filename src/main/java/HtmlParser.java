@@ -187,7 +187,7 @@ public class HtmlParser {
             List<Page> db = new ArrayList<>();
             Page firstPage = new Page(finalUrl, 0);
             db.add(firstPage);
-            int doc_max = 30;
+            int doc_max = 300;
             int[] doc_num = new int[1]; // counting the no. of documents fetched
             int[] track = new int[1]; // tracking which document to perform BFS
             ++doc_num[0];

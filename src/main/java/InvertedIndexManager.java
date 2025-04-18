@@ -432,6 +432,20 @@ public class InvertedIndexManager implements AutoCloseable {
     }
     
     /**
+     * Get postings list for a word from the body inverted index
+     */
+    public Object getBodyPostings(int wordId) throws IOException {
+        return bodyInvertedIndex.get(wordId);
+    }
+    
+    /**
+     * Get postings list for a word from the title inverted index
+     */
+    public Object getTitlePostings(int wordId) throws IOException {
+        return titleInvertedIndex.get(wordId);
+    }
+    
+    /**
      * Close the database
      */
     @Override
