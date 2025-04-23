@@ -120,7 +120,10 @@ public class SearchEngine implements AutoCloseable {
 //                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
 //                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
 //                    maxBody = entry.getValue();
-                    dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
+
+//                    dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
+                    dv.merge(t, (tb/(double)maxBody), Double::sum);
+                    System.out.println((tb/(double)maxBody) + " " + idf);
                 }
 //                if (tt>0) dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
                 if (tt>0){
@@ -128,7 +131,9 @@ public class SearchEngine implements AutoCloseable {
 //                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
 //                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
 //                    maxTitle = entry.getValue();
-                    dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
+
+//                    dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
+                    dv.merge(t, (tt/(double)maxTitle)*TITLE_BOOST, Double::sum);
                 }
             }
             if (dv.isEmpty()) continue;
