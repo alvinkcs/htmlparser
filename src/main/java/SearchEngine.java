@@ -104,17 +104,32 @@ public class SearchEngine implements AutoCloseable {
                 int tt  = getTf(index.getTitlePostings(wid), docId);
                 tfBody.put(t, tb);
                 tfTitle.put(t, tt);
-                if (tb > maxBody)   maxBody  = tb;
-                if (tt > maxTitle)  maxTitle = tt;
+//                if (tb > maxBody)   maxBody  = tb;
+//                if (tt > maxTitle)  maxTitle = tt;
             }
 
             Map<String,Double> dv = new HashMap<>();
             for (String t : terms) {
-                double idf = df.getOrDefault(t,0)==0? 0 : Math.log10((double) totalDocs / df.get(t));
+//                double idf = df.getOrDefault(t,0)==0? 0 : Math.log10((double) totalDocs / df.get(t));
+                double idf = qv.getOrDefault(t, 0.0); // default should not be 0
                 int tb = tfBody.get(t);
                 int tt = tfTitle.get(t);
-                if (tb>0) dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
-                if (tt>0) dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
+//                if (tb>0) dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
+                if (tb>0){
+                    maxBody = index.getMaxTFForPageId(docId);
+//                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
+//                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
+//                    maxBody = entry.getValue();
+                    dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
+                }
+//                if (tt>0) dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
+                if (tt>0){
+                    maxTitle = index.getMaxTFForPageId(docId);
+//                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
+//                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
+//                    maxTitle = entry.getValue();
+                    dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
+                }
             }
             if (dv.isEmpty()) continue;
 

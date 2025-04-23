@@ -120,6 +120,7 @@ public class HtmlParser {
                 for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
                     indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
                 }
+                indexManager.sortForMaxTFForPageId(dbPageId); // new
             }
             // retrieve links inside a page (child page)
             Elements links = doc.select("a");

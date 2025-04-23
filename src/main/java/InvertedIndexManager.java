@@ -1,9 +1,6 @@
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
-import jdbm.btree.BTree;
 import jdbm.helper.FastIterator;
-import jdbm.helper.Tuple;
-import jdbm.helper.TupleBrowser;
 import jdbm.htree.HTree;
 
 import java.io.IOException;
@@ -34,6 +31,8 @@ public class InvertedIndexManager implements AutoCloseable {
     private HTree pageIdToTitleWordsMap;
     
     private HTree counterMap;
+
+    private HTree maxTFForPageId;
     
     /**
      * Class to store information about a page
@@ -92,6 +91,8 @@ public class InvertedIndexManager implements AutoCloseable {
         pageIdToTitleWordsMap = loadOrCreateHTree("pageIdToTitleWords");
         
         counterMap = loadOrCreateHTree("counter");
+
+        maxTFForPageId = loadOrCreateHTree("maxTFForPageId");
         
         // Initialize counters if they don't exist
         if (counterMap.get("pageId") == null) {
@@ -443,6 +444,24 @@ public class InvertedIndexManager implements AutoCloseable {
      */
     public Object getTitlePostings(int wordId) throws IOException {
         return titleInvertedIndex.get(wordId);
+    }
+
+    public void sortForMaxTFForPageId(int pageId) throws IOException {
+        Map<String, Integer> map = getTopKeywords(pageId, 1);
+        Map.Entry<String, Integer> entry = map.entrySet().iterator().next();
+        System.out.println("maxTF of pageId:"+pageId + " is " + entry.getKey() + " " + entry.getValue());
+        maxTFForPageId.put(pageId, map);
+    }
+
+    public int getMaxTFForPageId(int pageId) throws IOException {
+        Map<String, Integer> map = (Map<String, Integer>) maxTFForPageId.get(pageId);
+        if (map != null){
+            Map.Entry<String, Integer> entry = map.entrySet().iterator().next();
+//            System.out.println(entry.getValue());
+            return entry.getValue();
+        } else {
+            return 1;
+        }
     }
     
     /**
