@@ -70,6 +70,19 @@ public class SearchEngine implements AutoCloseable {
         Map<String,Integer> df        = new HashMap<>();
         Map<String,Double>  qv        = new HashMap<>();
 
+        // calculate tf of query terms
+        int maxNumberOfTerm = 1;
+        Map<String, Integer> termMap = new HashMap<>();
+        for (String term: terms){
+            termMap.merge(term, 1, Integer::sum);
+            if (termMap.get(term) > maxNumberOfTerm){
+                maxNumberOfTerm = termMap.get(term);
+            }
+        }
+        // filter out duplicated query terms
+        Set<String> termSet = new HashSet<>(terms);
+        terms = new ArrayList<>(termSet);
+
         for (String t : terms) {
             int wid;
             try { wid = index.getWordId(t); }
@@ -85,8 +98,9 @@ public class SearchEngine implements AutoCloseable {
             if (title != null) docs.addAll(title.keySet());
             df.put(t, docs.size());
 
+            double tf = (double) termMap.get(t) /maxNumberOfTerm;
             double idf = docs.isEmpty()? 0 : Math.log10((double) totalDocs / docs.size());
-            qv.merge(t, idf, Double::sum);              // query tf == 1 each occurrence
+            qv.merge(t, tf*idf, Double::sum);              // query tf == 1 each occurrence
         }
         double qMag = Math.sqrt(qv.values().stream().mapToDouble(w -> w*w).sum());
         if (qMag == 0) return Collections.emptyList();
@@ -110,30 +124,19 @@ public class SearchEngine implements AutoCloseable {
 
             Map<String,Double> dv = new HashMap<>();
             for (String t : terms) {
-//                double idf = df.getOrDefault(t,0)==0? 0 : Math.log10((double) totalDocs / df.get(t));
-                double idf = qv.getOrDefault(t, 0.0); // default should not be 0
+                double idf = df.getOrDefault(t,0)==0? 0 : Math.log10((double) totalDocs / df.get(t));
                 int tb = tfBody.get(t);
                 int tt = tfTitle.get(t);
 //                if (tb>0) dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
                 if (tb>0){
                     maxBody = index.getMaxTFForPageId(docId);
-//                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
-//                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
-//                    maxBody = entry.getValue();
 
-//                    dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
-                    dv.merge(t, (tb/(double)maxBody), Double::sum);
-                    System.out.println((tb/(double)maxBody) + " " + idf);
+                    dv.merge(t, (tb/(double)maxBody)*idf, Double::sum);
                 }
 //                if (tt>0) dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
                 if (tt>0){
                     maxTitle = index.getMaxTFForPageId(docId);
-//                    Map<String, Integer> topKeyword = index.getTopKeywords(docId, 1);
-//                    Map.Entry<String,Integer> entry = topKeyword.entrySet().iterator().next();
-//                    maxTitle = entry.getValue();
-
-//                    dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
-                    dv.merge(t, (tt/(double)maxTitle)*TITLE_BOOST, Double::sum);
+                    dv.merge(t, (tt/(double)maxTitle)*idf*TITLE_BOOST, Double::sum);
                 }
             }
             if (dv.isEmpty()) continue;
