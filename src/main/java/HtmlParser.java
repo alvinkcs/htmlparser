@@ -19,6 +19,7 @@ public class HtmlParser {
     private static final String OUTPUT_FILE = "spider_result.txt";
     private static final int MAX_KEYWORDS_TO_DISPLAY = 10;
     private static final int MAX_LINKS_TO_DISPLAY = 10;
+    private static final int MAX_NGRAM = 3;
 
     public static class Page {
         public int pageID;
@@ -67,8 +68,9 @@ public class HtmlParser {
             boolean pageHasUpdate = indexManager.hasUpdate(page.url);
 
             if (!indexManager.hasKeyword(page.url) || pageHasUpdate){ // !page.extractedKeywords || pageHasUpdate
-                StringTokenizer st = new StringTokenizer(doc.body().text(), " "); // " (),.:/<>;\"\n\t\\\b"
+                StringTokenizer st = new StringTokenizer(doc.body().text(), " ");
                 Map<String, Integer> bodyWordFreq = new HashMap<>();
+                List<String> bodyTokens = new ArrayList<>();
 
                 while (st.hasMoreTokens()) {
                     String nextToken = st.nextToken().toLowerCase();
@@ -76,10 +78,10 @@ public class HtmlParser {
                         String token_word = stopStem.stem(nextToken);
 
                         if (token_word.equals("")){
-//                            System.out.println(nextToken + " becomes empty after tokenization");
                             continue;
                         }
 
+                        bodyTokens.add(token_word);
                         if (page.bodyStem.get(token_word) != null){
                             page.bodyStem.get(token_word).put(page.pageID, page.bodyStem.get(token_word).get(page.pageID)+1);
                         } else {
@@ -95,10 +97,17 @@ public class HtmlParser {
                 for (Map.Entry<String, Integer> entry : bodyWordFreq.entrySet()) {
                     indexManager.addWordToBody(dbPageId, entry.getKey(), entry.getValue());
                 }
-                System.out.println("Added " + bodyWordFreq.size() + " body keywords for page ID: " + dbPageId);
+                for (int n = 2; n <= MAX_NGRAM; n++) {
+                    for (int i = 0; i + n <= bodyTokens.size(); i++) {
+                        String ngram = String.join(" ", bodyTokens.subList(i, i + n));
+                        indexManager.addWordToBody(dbPageId, ngram, 1);
+                    }
+                }
+                System.out.println("Added " + bodyWordFreq.size() + " body keywords and n-grams for page ID: " + dbPageId);
 
                 st = new StringTokenizer(doc.head().text(), " ");
                 Map<String, Integer> titleWordFreq = new HashMap<>();
+                List<String> titleTokens = new ArrayList<>();
 
                 while (st.hasMoreTokens()) {
                     String nextToken = st.nextToken().toLowerCase();
@@ -114,11 +123,18 @@ public class HtmlParser {
                         }
 
                         titleWordFreq.put(token_word, titleWordFreq.getOrDefault(token_word, 0) + 1);
+                        titleTokens.add(token_word);
                     }
                 }
 
                 for (Map.Entry<String, Integer> entry : titleWordFreq.entrySet()) {
                     indexManager.addWordToTitle(dbPageId, entry.getKey(), entry.getValue());
+                }
+                for (int n = 2; n <= MAX_NGRAM; n++) {
+                    for (int i = 0; i + n <= titleTokens.size(); i++) {
+                        String ngram = String.join(" ", titleTokens.subList(i, i + n));
+                        indexManager.addWordToTitle(dbPageId, ngram, 1);
+                    }
                 }
                 indexManager.sortForMaxTFForPageId(dbPageId); // new
             }

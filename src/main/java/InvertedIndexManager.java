@@ -147,6 +147,14 @@ public class InvertedIndexManager implements AutoCloseable {
         }
     }
 
+    /**
+     * Get a word ID if it exists (do not create a new one).
+     */
+    public Integer getWordIdIfExists(String word) throws IOException {
+        Object id = wordToWordIdMap.get(word);
+        return id == null ? null : (Integer) id;
+    }
+
     public boolean hasUpdate(String url) throws IOException {
         if (urlToPageIdMap.get(url) != null){
             PageInfo page = (PageInfo) pageInfoMap.get(urlToPageIdMap.get(url));
