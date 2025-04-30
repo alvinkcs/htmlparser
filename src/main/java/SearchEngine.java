@@ -64,7 +64,17 @@ public class SearchEngine implements AutoCloseable {
         if (phrases.isEmpty()) {
             String defaultPhrase = processPhrase(raw);
             if (defaultPhrase.contains(" ")) {
-                phrases.add(defaultPhrase);
+                List<String> words = new ArrayList<>(Arrays.asList(defaultPhrase.split(" ")));
+                List<String> ngram_list = new ArrayList<>();
+                int MAX_NGRAM = 3;
+                for (int n = 2; n <= MAX_NGRAM; n++) {
+                    for (int i = 0; i + n <= words.size(); i++) {
+                        String ngram = String.join(" ", words.subList(i, i + n));
+                        ngram_list.add(ngram);
+                    }
+                }
+                phrases.addAll(ngram_list);
+//                phrases.add(defaultPhrase);
                 // Don't add terms again - they were already added during initial tokenization
                 // Collections.addAll(terms, defaultPhrase.split(" "));
             }
@@ -92,9 +102,14 @@ public class SearchEngine implements AutoCloseable {
                 }
             }
             // If no matches found for this phrase, no documents can match the query
-            if (hits.isEmpty()) return Collections.emptyList();
-            candidates.retainAll(hits);
-            if (candidates.isEmpty()) return Collections.emptyList();
+            if (hits.isEmpty() && terms.isEmpty()){
+                return Collections.emptyList();
+            } else if (!hits.isEmpty()){
+                candidates.retainAll(hits);
+            }
+//            if (hits.isEmpty() && terms.isEmpty()) return Collections.emptyList();
+//            candidates.retainAll(hits);
+            if (candidates.isEmpty() && terms.isEmpty()) return Collections.emptyList();
         }
         System.out.println("Candidates: " + candidates);
 
