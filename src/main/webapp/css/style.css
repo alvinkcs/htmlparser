@@ -78,6 +78,20 @@ body {
     background-color: #f5f5f5;
 }
 
+.similar-pages-button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    padding: 8px 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.similar-pages-button:hover {
+    background-color: #0b60cf;
+}
+
 .result-stats {
     color: var(--text-gray);
     margin-bottom: 30px;

@@ -63,6 +63,12 @@
                             <%= result.get("formattedKeywords") %>
                         </div>
                         
+                        <!-- Get Similar Pages Button -->
+                        <form action="search" method="GET" style="display:inline;">
+                            <input type="hidden" name="query" value="<%= result.get("topKeywordsQuery") %>" />
+                            <button type="submit" class="similar-pages-button">Find Similar Pages</button>
+                        </form>
+                        
                         <% 
                         List<String> parentLinks = (List<String>) result.get("parentLinks");
                         List<String> childLinks = (List<String>) result.get("childLinks");
@@ -119,4 +125,4 @@
         <% } %>
     </div>
 </body>
-</html> 
+</html>

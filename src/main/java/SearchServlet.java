@@ -62,13 +62,16 @@ public class SearchServlet extends HttpServlet {
                     // Process keywords
                     Map<String, Integer> keywords = indexManager.getTopKeywords(pageId, MAX_KEYWORDS);
                     StringBuilder keywordStr = new StringBuilder();
+                    StringBuilder topKeywordsQuery = new StringBuilder();
                     if (keywords != null && !keywords.isEmpty()) {
                         int count = 0;
                         for (Map.Entry<String, Integer> entry : keywords.entrySet()) {
                             if (count > 0) {
                                 keywordStr.append("; ");
+                                topKeywordsQuery.append(" ");
                             }
                             keywordStr.append(entry.getKey()).append(" ").append(entry.getValue());
+                            topKeywordsQuery.append(entry.getKey());
                             count++;
                             if (count >= MAX_KEYWORDS) break;
                         }
@@ -76,6 +79,7 @@ public class SearchServlet extends HttpServlet {
                         keywordStr.append("No keywords available");
                     }
                     processedResult.put("formattedKeywords", keywordStr.toString());
+                    processedResult.put("topKeywordsQuery", topKeywordsQuery.toString().trim());
                     
                     // Get page info with child links
                     InvertedIndexManager.PageInfo pageInfo = indexManager.getPageInfo(pageId);
@@ -142,4 +146,4 @@ public class SearchServlet extends HttpServlet {
             }
         }
     }
-} 
+}
