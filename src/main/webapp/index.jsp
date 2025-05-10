@@ -81,8 +81,9 @@
                                     for (String pair : keywordPairs) {
                                         String[] parts = pair.split(" ");
                                         if (parts.length >= 2) {
-                                            String keyword = parts[0];
-                                            String count = parts[1];
+                                            // Join all but the last part for the keyword, last part is the count
+                                            String keyword = String.join(" ", java.util.Arrays.copyOfRange(parts, 0, parts.length - 1));
+                                            String count = parts[parts.length - 1];
                                 %>
                                     <span class="keyword-pill"><%= keyword %> <span class="keyword-count"><%= count %></span></span>
                                 <%
