@@ -55,7 +55,7 @@ public class SearchProgram {
                     
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     
-                    for (int i = 0; i < results.size(); i++) {
+                    for (int i = 0; i < Math.min(results.size(),50); i++) {
                         SearchEngine.SearchResult result = results.get(i);
                         System.out.println((i + 1) + ". " + (result.getTitle().isEmpty() ? result.getUrl() : result.getTitle()));
                         System.out.println("   URL: " + result.getUrl());

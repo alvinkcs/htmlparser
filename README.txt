@@ -104,6 +104,6 @@ Files Included
 9. webapp/index.jsp - Main web interface for submitting search queries and displaying search results with advanced features and suggestions
 10. stopwords.txt - List of stop words to be ignored
 11. pom.xml - Maven project file with dependencies
-12. spider_index.db - Generated database file (after running HtmlParser)
-13. spider_result.txt - Generated output file (after running TestProgram)
+12. Report.docs - Document summarising the overall design of the system
+13. Report.pdf - Document summarising the overall design of the system
 14. Grp 1 Phase 1 Document.pdf - Document containing the design of the jdbm database scheme of the indexer

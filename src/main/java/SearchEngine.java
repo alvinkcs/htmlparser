@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  *   • title‑field boost
  */
 public class SearchEngine implements AutoCloseable {
-    private static final int MAX_RESULTS        = 50;
+    private static final int MAX_RESULTS        = 300;
     private static final double TITLE_BOOST     = 5.0;
 
     private final InvertedIndexManager index;
@@ -54,31 +54,32 @@ public class SearchEngine implements AutoCloseable {
                 String processed = processPhrase(phrase);
                 if (!processed.isEmpty()) {
                     phrases.add(processed);
-                    Collections.addAll(terms, processed.split(" ")); // keep duplicates
+//                    Collections.addAll(terms, processed.split(" ")); // keep duplicates
+                    Collections.addAll(terms, processed); // keep duplicates
                 }
             } else if (token != null) {
                 addTerm(token, terms);
             }
         }
-        // If no quoted phrase but query contains multiple words, treat the whole query as a phrase
-        if (phrases.isEmpty()) {
-            String defaultPhrase = processPhrase(raw);
-            if (defaultPhrase.contains(" ")) {
-                List<String> words = new ArrayList<>(Arrays.asList(defaultPhrase.split(" ")));
-                List<String> ngram_list = new ArrayList<>();
-                int MAX_NGRAM = 3;
-                for (int n = 2; n <= MAX_NGRAM; n++) {
-                    for (int i = 0; i + n <= words.size(); i++) {
-                        String ngram = String.join(" ", words.subList(i, i + n));
-                        ngram_list.add(ngram);
-                    }
-                }
-                phrases.addAll(ngram_list);
-//                phrases.add(defaultPhrase);
-                // Don't add terms again - they were already added during initial tokenization
-                // Collections.addAll(terms, defaultPhrase.split(" "));
-            }
-        }
+//        // If no quoted phrase but query contains multiple words, treat the whole query as a phrase
+//        if (phrases.isEmpty()) {
+//            String defaultPhrase = processPhrase(raw);
+//            if (defaultPhrase.contains(" ")) {
+//                List<String> words = new ArrayList<>(Arrays.asList(defaultPhrase.split(" ")));
+//                List<String> ngram_list = new ArrayList<>();
+//                int MAX_NGRAM = 3;
+//                for (int n = 2; n <= MAX_NGRAM; n++) {
+//                    for (int i = 0; i + n <= words.size(); i++) {
+//                        String ngram = String.join(" ", words.subList(i, i + n));
+//                        ngram_list.add(ngram);
+//                    }
+//                }
+//                phrases.addAll(ngram_list);
+////                phrases.add(defaultPhrase);
+//                // Don't add terms again - they were already added during initial tokenization
+//                // Collections.addAll(terms, defaultPhrase.split(" "));
+//            }
+//        }
 
         System.out.println("Phrases: " + phrases);
         System.out.println("Terms: " + terms);  
@@ -132,6 +133,9 @@ public class SearchEngine implements AutoCloseable {
 
         for (String t : terms) {
             int wid;
+            if (index.getWordIdIfExists(t) == null){
+                continue;
+            }
             try { wid = index.getWordIdIfExists(t); }
             catch (IOException e) { continue; }
             if (wid == 0) continue; // Skip if term doesn't exist in index
