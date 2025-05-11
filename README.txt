@@ -24,7 +24,7 @@ To run the spider and generate both the database and the output file:
 
 This will:
 - Start the crawler from the seed URL
-- Index 30 pages
+- Index 300 pages
 - Generate the spider_index.db database file
 
 Remarks:
