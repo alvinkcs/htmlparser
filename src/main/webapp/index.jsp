@@ -8,22 +8,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Search Engine</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="search-container">
-        <h1>Web Search Engine</h1>
-        <form action="search" method="GET">
-            <div class="search-box-container">
-                <input type="text" name="query" value="<%= request.getParameter("query") != null ? request.getParameter("query") : "" %>" 
-                       class="search-box" placeholder="Enter search query (use quotes for phrases)">
-                <button type="submit" class="search-button">Search</button>
-            </div>
-        </form>
+    <div class="hero-section">
+        <div class="search-container">
+            <h1><i class="fas fa-search-location"></i> Advanced Web Search Engine</h1>
+            <form action="search" method="GET">
+                <div class="search-box-container">
+                    <input type="text" name="query" value="<%= request.getParameter("query") != null ? request.getParameter("query") : "" %>" 
+                           class="search-box" placeholder="Enter search query (use quotes for phrases)" autofocus>
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
     
     <div class="container">
         <% if (request.getAttribute("error") != null) { %>
-            <div class="error"><%= request.getAttribute("error") %></div>
+            <div class="error">
+                <i class="fas fa-exclamation-circle"></i> <%= request.getAttribute("error") %>
+            </div>
         <% } %>
         
         <% 
@@ -33,34 +45,67 @@
             Long searchTime = (Long) request.getAttribute("searchTime");
         %>
             <div class="result-stats">
-                Found <%= resultCount %> results (<%= searchTime %> ms)
+                <i class="fas fa-chart-bar"></i> Found <strong><%= resultCount %></strong> results (<%= searchTime %> ms)
             </div>
             
             <div class="results-container">
                 <% for (Map<String, Object> result : results) { %>
                     <div class="result-item">
-                        <div class="score">
-                            <%= result.get("score") %>
+                        <div class="score" title="Relevance Score">
+                            <i class="fas fa-star"></i> <%= result.get("score") %>
                         </div>
                         
                         <div class="result-title">
                             <a href="<%= result.get("url") %>" target="_blank">
-                                <%= result.get("title") %>
+                                <i class="fas fa-external-link-alt"></i> <%= result.get("title") %>
                             </a>
                         </div>
                         
                         <div class="result-url">
-                            <a href="<%= result.get("url") %>" target="_blank"><%= result.get("url") %></a>
+                            <i class="fas fa-link"></i> <a href="<%= result.get("url") %>" target="_blank"><%= result.get("url") %></a>
                         </div>
                         
                         <div class="result-meta">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            <%= result.get("formattedDate") %>, <%= result.get("size") %> bytes
+                            <span><i class="far fa-clock"></i> <%= result.get("formattedDate") %></span>
+                            <span class="meta-divider">|</span>
+                            <span><i class="fas fa-file-alt"></i> <%= result.get("size") %> bytes</span>
                         </div>
                         
                         <div class="result-keywords">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-                            <%= result.get("formattedKeywords") %>
+                            <div class="keyword-title"><i class="fas fa-tags"></i> Top Keywords:</div>
+                            <div class="keyword-pills">
+                                <% 
+                                String keywordsStr = (String) result.get("formattedKeywords");
+                                if (!keywordsStr.equals("No keywords available")) {
+                                    String[] keywordPairs = keywordsStr.split("; ");
+                                    for (String pair : keywordPairs) {
+                                        String[] parts = pair.split(" ");
+                                        if (parts.length >= 2) {
+                                            // Join all but the last part for the keyword, last part is the count
+                                            String keyword = String.join(" ", java.util.Arrays.copyOfRange(parts, 0, parts.length - 1));
+                                            String count = parts[parts.length - 1];
+                                %>
+                                    <span class="keyword-pill"><%= keyword %> <span class="keyword-count"><%= count %></span></span>
+                                <%
+                                        }
+                                    }
+                                } else {
+                                %>
+                                    <span class="no-keywords">No keywords available</span>
+                                <%
+                                }
+                                %>
+                            </div>
+                        </div>
+                        
+                        <!-- Get Similar Pages Button -->
+                        <div class="action-buttons">
+                            <form action="search" method="GET">
+                                <input type="hidden" name="query" value="<%= result.get("topKeywordsQuery") %>" />
+                                <button type="submit" class="similar-pages-button">
+                                    <i class="fas fa-layer-group"></i> Find Similar Pages
+                                </button>
+                            </form>
                         </div>
                         
                         <% 
@@ -71,52 +116,94 @@
                         if (hasLinks) {
                         %>
                             <div class="links-section">
-                                <!-- Parent links -->
-                                <% if (parentLinks != null && !parentLinks.isEmpty()) { %>
-                                    <div class="links-title">Parent Links:</div>
-                                    <div class="result-links">
-                                        <% for (String parentUrl : parentLinks) { %>
-                                            <div>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                                                <a href="<%= parentUrl %>" target="_blank"><%= parentUrl %></a>
+                                <div class="links-container">
+                                    <!-- Parent links -->
+                                    <% if (parentLinks != null && !parentLinks.isEmpty()) { %>
+                                        <div class="links-column">
+                                            <div class="links-title"><i class="fas fa-level-up-alt"></i> Parent Links:</div>
+                                            <div class="result-links">
+                                                <% for (String parentUrl : parentLinks) { %>
+                                                    <div class="link-item">
+                                                        <i class="fas fa-angle-right"></i>
+                                                        <a href="<%= parentUrl %>" target="_blank" title="<%= parentUrl %>">
+                                                            <%= parentUrl.length() > 50 ? parentUrl.substring(0, 47) + "..." : parentUrl %>
+                                                        </a>
+                                                    </div>
+                                                <% } %>
                                             </div>
-                                        <% } %>
-                                    </div>
-                                <% } %>
-                                
-                                <!-- Child links -->
-                                <% if (childLinks != null && !childLinks.isEmpty()) { %>
-                                    <div class="links-title">Child Links:</div>
-                                    <div class="result-links">
-                                        <% for (String childUrl : childLinks) { %>
-                                            <div>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                                                <a href="<%= childUrl %>" target="_blank"><%= childUrl %></a>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <!-- Child links -->
+                                    <% if (childLinks != null && !childLinks.isEmpty()) { %>
+                                        <div class="links-column">
+                                            <div class="links-title"><i class="fas fa-level-down-alt"></i> Child Links:</div>
+                                            <div class="result-links">
+                                                <% for (String childUrl : childLinks) { %>
+                                                    <div class="link-item">
+                                                        <i class="fas fa-angle-right"></i>
+                                                        <a href="<%= childUrl %>" target="_blank" title="<%= childUrl %>">
+                                                            <%= childUrl.length() > 50 ? childUrl.substring(0, 47) + "..." : childUrl %>
+                                                        </a>
+                                                    </div>
+                                                <% } %>
                                             </div>
-                                        <% } %>
-                                    </div>
-                                <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
                             </div>
                         <% } %>
                     </div>
                 <% } %>
             </div>
+            
         <% } else if (request.getParameter("query") != null) { %>
             <div class="no-results">
+                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px; color: #ddd;"></i>
                 <h2>No results found</h2>
                 <p>Try a different search query or check if the index has been built.</p>
+                <div class="search-suggestions">
+                    <p>Suggestions:</p>
+                    <ul>
+                        <li>Check if your spelling is correct</li>
+                        <li>Try more general keywords</li>
+                        <li>Reduce the number of keywords</li>
+                    </ul>
+                </div>
             </div>
         <% } else { %>
             <div class="help-section">
-                <h2>How to Use This Search Engine</h2>
-                <ol>
-                    <li>Make sure you have run the crawler (HtmlParser) first to build the index</li>
-                    <li>Enter your search terms in the box above</li>
-                    <li>Use quotes for phrases, e.g. "hong kong" university</li>
-                    <li>Click the Search button to see results</li>
-                </ol>
+                <h2><i class="fas fa-info-circle"></i> How to Use This Search Engine</h2>
+                <div class="help-grid">
+                    <div class="help-card">
+                        <div class="help-icon"><i class="fas fa-database"></i></div>
+                        <h3>Build the Index</h3>
+                        <p>Make sure you have run the crawler (HtmlParser) first to build the index</p>
+                    </div>
+                    <div class="help-card">
+                        <div class="help-icon"><i class="fas fa-keyboard"></i></div>
+                        <h3>Enter Search Terms</h3>
+                        <p>Type your search query in the search box above</p>
+                    </div>
+                    <div class="help-card">
+                        <div class="help-icon"><i class="fas fa-quote-right"></i></div>
+                        <h3>Use Quotes for Phrases</h3>
+                        <p>For example: "hong kong" university</p>
+                    </div>
+                    <div class="help-card">
+                        <div class="help-icon"><i class="fas fa-search"></i></div>
+                        <h3>Search</h3>
+                        <p>Click the Search button to see results</p>
+                    </div>
+                </div>
             </div>
         <% } %>
     </div>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; <%= new java.util.Date().getYear() + 1900 %> Web Search Engine - A Java-based search engine with TF-IDF weighting</p>
+        </div>
+    </footer>
 </body>
-</html> 
+</html>

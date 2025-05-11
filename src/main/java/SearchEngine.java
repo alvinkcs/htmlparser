@@ -218,31 +218,22 @@ public class SearchEngine implements AutoCloseable {
                 if (tb == null) tb = 0;
                 if (tt == null) tt = 0;
 
-                if (tb > 0){
-                    int mb = maxTFCache.getOrDefault(docId, 1);
-                    dv.merge(t, (tb / (double) mb) * idf, Double::sum);
+                // Use log-scaled tf for body and title
+                double tfBodyWeight = (tb > 0) ? (1.0 + Math.log(tb)) : 0.0;
+                double tfTitleWeight = (tt > 0) ? (1.0 + Math.log(tt)) : 0.0;
+
+                if (tfBodyWeight > 0) {
+                    dv.merge(t, tfBodyWeight * idf, Double::sum);
                 }
-                if (tt > 0){
-                    int mt = maxTFCache.getOrDefault(docId, 1);
-                    dv.merge(t, (tt / (double) mt) * idf * TITLE_BOOST, Double::sum);
+                if (tfTitleWeight > 0) {
+                    dv.merge(t, tfTitleWeight * idf * TITLE_BOOST, Double::sum);
                 }
             }
             if (dv.isEmpty()) continue;
 
-            double dot=0, dMag=0;
-            for (Map.Entry<String,Double> e : dv.entrySet()) {
-                double dw = e.getValue();
-                dMag += dw*dw;
-                String term = e.getKey();
-                // Only add to dot product if term exists in query vector
-                if (qv.containsKey(term)) {
-                    dot += dw * qv.get(term);
-                }
-            }
-            dMag = Math.sqrt(dMag);
-            if (dMag==0) continue;
-            double sim = dot / (qMag*dMag);
-            if (sim>0) scored.add(new ScoredDoc(docId,sim));
+            // sum of all tf-idf weights (with title boost)
+            double score = dv.values().stream().mapToDouble(Double::doubleValue).sum();
+            if (score > 0) scored.add(new ScoredDoc(docId, score));
         }
 
         scored.sort(Comparator.comparing(ScoredDoc::score).reversed());

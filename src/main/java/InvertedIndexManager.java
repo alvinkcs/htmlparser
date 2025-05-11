@@ -45,6 +45,7 @@ public class InvertedIndexManager implements AutoCloseable {
         public long lastModifiedDate;
         public long size;
         public List<Integer> childPageIds = new ArrayList<>();
+        public Map<String, Integer> keywords = new HashMap<>();
         
         public PageInfo(String url, String title, long lastModifiedDate, long size) {
             this.url = url;
@@ -253,6 +254,14 @@ public class InvertedIndexManager implements AutoCloseable {
         words.add(word);
         pageIdToBodyWordsMap.put(pageId, words);
         
+        // Update PageInfo keywords map for fast lookup
+        PageInfo pageInfo = getPageInfo(pageId);
+        if (pageInfo != null) {
+            pageInfo.keywords.put(word, pageInfo.keywords.getOrDefault(word, 0) + frequency);
+            pageInfoMap.put(pageId, pageInfo);
+            recman.commit();
+        }
+        
         recman.commit();
     }
     
@@ -274,6 +283,14 @@ public class InvertedIndexManager implements AutoCloseable {
         List<String> words = (List<String>) pageIdToTitleWordsMap.get(pageId);
         words.add(word);
         pageIdToTitleWordsMap.put(pageId, words);
+        
+        // Update PageInfo keywords map for fast lookup
+        PageInfo pageInfo = getPageInfo(pageId);
+        if (pageInfo != null) {
+            pageInfo.keywords.put(word, pageInfo.keywords.getOrDefault(word, 0) + frequency);
+            pageInfoMap.put(pageId, pageInfo);
+            recman.commit();
+        }
         
         recman.commit();
     }
@@ -307,45 +324,11 @@ public class InvertedIndexManager implements AutoCloseable {
      * Get top keywords for a page (by frequency)
      */
     public Map<String, Integer> getTopKeywords(int pageId, int limit) throws IOException {
-        Map<String, Integer> keywords = new HashMap<>();
-        
-        // Collect words from body index
-        FastIterator iter = bodyInvertedIndex.keys();
-        Object key;
-        
-        while ((key = iter.next()) != null) {
-            if (key instanceof Integer) {
-                int wordId = (Integer) key;
-                HashMap<Integer, Integer> postings = (HashMap<Integer, Integer>) bodyInvertedIndex.get(wordId);
-                
-                if (postings != null && postings.containsKey(pageId)) {
-                    String word = (String) wordIdToWordMap.get(wordId);
-                    keywords.put(word, postings.get(pageId));
-                }
-            }
+        PageInfo pageInfo = getPageInfo(pageId);
+        if (pageInfo == null || pageInfo.keywords == null || pageInfo.keywords.isEmpty()) {
+            return Collections.emptyMap();
         }
-
-        // Collect words from body index
-       iter = titleInvertedIndex.keys();
-
-        while ((key = iter.next()) != null) {
-            if (key instanceof Integer) {
-                int wordId = (Integer) key;
-                HashMap<Integer, Integer> postings = (HashMap<Integer, Integer>) titleInvertedIndex.get(wordId);
-
-                if (postings != null && postings.containsKey(pageId)) {
-                    String word = (String) wordIdToWordMap.get(wordId);
-                    if (keywords.get(word) != null){
-                        keywords.put(word, postings.get(pageId) + keywords.get(word));
-                    } else {
-                        keywords.put(word, postings.get(pageId));
-                    }
-                }
-            }
-        }
-        
-        // Sort by frequency and limit
-        return sortByValueAndLimit(keywords, limit);
+        return sortByValueAndLimit(pageInfo.keywords, limit);
     }
     
     /**
@@ -487,4 +470,4 @@ public class InvertedIndexManager implements AutoCloseable {
         }
     }
 
-} 
+}
