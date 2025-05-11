@@ -42,6 +42,7 @@ public class SearchServlet extends HttpServlet {
         }
         
         if (query != null && !query.isBlank()) {
+            query=query.trim();
             // Add the current query to recent searches if it's not already there
             if (!recentSearches.contains(query)) {
                 // If we already have MAX_RECENT_SEARCHES, remove the oldest one

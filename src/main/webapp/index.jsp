@@ -34,7 +34,7 @@
             %>
                 <div class="recent-searches">
                     <% for (int i = recentSearches.size() - 1; i >= 0; i--) { 
-                        String escapedQuery = recentSearches.get(i).replace("'", "\\'");
+                        String escapedQuery = recentSearches.get(i).replace("'", "\\'").replace('\"', '`');
                     %>
                         <div class="recent-search-item" onclick="loadSearch('<%= escapedQuery %>')">
                             <i class="fas fa-history"></i> <%= recentSearches.get(i) %>
@@ -223,7 +223,7 @@
     <script>
         // Function to handle clicking on a recent search
         function loadSearch(query) {
-            document.getElementById('queryInput').value = query;
+            document.getElementById('queryInput').value = query.replaceAll('`', '\"');
             document.getElementById('searchForm').submit();
         }
     </script>
