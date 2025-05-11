@@ -18,16 +18,30 @@
     <div class="hero-section">
         <div class="search-container">
             <h1><i class="fas fa-search-location"></i> Advanced Web Search Engine</h1>
-            <form action="search" method="GET">
+            <form action="search" method="GET" id="searchForm">
                 <div class="search-box-container">
-                    <input type="text" name="query" value="<%= request.getParameter("query") != null ? request.getParameter("query") : "" %>" 
+                    <input type="text" name="query" id="queryInput" value="<%= request.getParameter("query") != null ? request.getParameter("query") : "" %>" 
                            class="search-box" placeholder="Enter search query (use quotes for phrases)" autofocus>
                     <button type="submit" class="search-button">
                         <i class="fas fa-search"></i> Search
                     </button>
                 </div>
-
             </form>
+            
+            <% 
+            List<String> recentSearches = (List<String>) request.getAttribute("recentSearches");
+            if (recentSearches != null && !recentSearches.isEmpty()) { 
+            %>
+                <div class="recent-searches">
+                    <% for (int i = recentSearches.size() - 1; i >= 0; i--) { 
+                        String escapedQuery = recentSearches.get(i).replace("'", "\\'");
+                    %>
+                        <div class="recent-search-item" onclick="loadSearch('<%= escapedQuery %>')">
+                            <i class="fas fa-history"></i> <%= recentSearches.get(i) %>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
         </div>
     </div>
     
@@ -205,5 +219,13 @@
             <p>&copy; <%= new java.util.Date().getYear() + 1900 %> Web Search Engine - A Java-based search engine with TF-IDF weighting</p>
         </div>
     </footer>
+    
+    <script>
+        // Function to handle clicking on a recent search
+        function loadSearch(query) {
+            document.getElementById('queryInput').value = query;
+            document.getElementById('searchForm').submit();
+        }
+    </script>
 </body>
 </html>

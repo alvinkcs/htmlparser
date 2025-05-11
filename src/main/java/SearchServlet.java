@@ -3,6 +3,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -12,6 +13,7 @@ public class SearchServlet extends HttpServlet {
     private static final String DB_NAME = "spider_index";
     private static final int MAX_KEYWORDS = 5;
     private static final int MAX_LINKS = 5;
+    private static final int MAX_RECENT_SEARCHES = 5;
     
     private SearchEngine searchEngine;
     private InvertedIndexManager indexManager;
@@ -31,7 +33,30 @@ public class SearchServlet extends HttpServlet {
             throws ServletException, IOException {
         String query = request.getParameter("query");
         
+        // Get or create session for storing recent searches
+        HttpSession session = request.getSession(true);
+        List<String> recentSearches = (List<String>) session.getAttribute("recentSearches");
+        if (recentSearches == null) {
+            recentSearches = new ArrayList<>();
+            session.setAttribute("recentSearches", recentSearches);
+        }
+        
         if (query != null && !query.isBlank()) {
+            // Add the current query to recent searches if it's not already there
+            if (!recentSearches.contains(query)) {
+                // If we already have MAX_RECENT_SEARCHES, remove the oldest one
+                if (recentSearches.size() >= MAX_RECENT_SEARCHES) {
+                    recentSearches.remove(0);
+                }
+                recentSearches.add(query);
+                session.setAttribute("recentSearches", recentSearches);
+            } else {
+                // If the query is already in the list, move it to the end (most recent)
+                recentSearches.remove(query);
+                recentSearches.add(query);
+                session.setAttribute("recentSearches", recentSearches);
+            }
+            
             try {
                 long startTime = System.currentTimeMillis();
                 List<SearchEngine.SearchResult> searchResults = searchEngine.search(query);
@@ -121,12 +146,20 @@ public class SearchServlet extends HttpServlet {
                 request.setAttribute("query", query);
                 request.setAttribute("searchTime", (endTime - startTime));
                 request.setAttribute("resultCount", searchResults.size());
+                
+                // Pass recent searches to the JSP
+                request.setAttribute("recentSearches", recentSearches);
+                
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
             } catch (Exception e) {
                 request.setAttribute("error", "Error executing search: " + e.getMessage());
+                request.getRequestDispatcher("/index.jsp").forward(request, response);
             }
+        } else {
+            // No query submitted, but still pass recent searches to the JSP
+            request.setAttribute("recentSearches", recentSearches);
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
         }
-        
     }
     
     @Override
